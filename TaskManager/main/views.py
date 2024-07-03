@@ -1,13 +1,11 @@
-from django.shortcuts import render, redirect, get_object_or_404, HttpResponse
+from django.shortcuts import render, redirect, get_object_or_404, HttpResponse, HttpResponseRedirect
+from django.contrib import messages
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.forms import AuthenticationForm
 from django.db import models
 from .models import Task, Chapter
 from .forms import TaskForm, UserRegisterForm
 from django.contrib.auth.decorators import login_required
-import logging
-
-logger = logging.getLogger(__name__)
 
 
 @login_required
@@ -22,6 +20,7 @@ def index(request):
         'tasks': tasks,
     }
     return render(request, 'main/index.html', context)
+
 
 @login_required
 def create(request):
@@ -56,16 +55,27 @@ def about(request):
 def edit(request, task_id):
     task = get_object_or_404(Task, id=task_id)
     error = ''
+
+    if task.user != request.user:
+        messages.error(request, 'Вы не имеете права редактировать эту задачу.')
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+
     if request.method == 'POST':
-        form = TaskForm(request.POST, instance=task)
-        if form.is_valid():
-            task = form.save(commit=False)
-            task.user = request.user
-            task.save()
-            form.save_m2m()  # save the many-to-many field after saving the task
+        if 'save' in request.POST:
+            form = TaskForm(request.POST, instance=task)
+            if form.is_valid():
+                task = form.save(commit=False)
+                task.user = request.user
+                task.save()
+                form.save_m2m()  # save the many-to-many field after saving the task
+                messages.success(request, 'Задача успешно обновлена.')
+                return redirect('/')
+            else:
+                error = 'Форма неверна'
+        elif 'delete' in request.POST:
+            task.delete()
+            messages.success(request, 'Задача успешно удалена.')
             return redirect('/')
-        else:
-            error = 'Форма неверна'
     else:
         form = TaskForm(instance=task)
 
@@ -116,6 +126,7 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return redirect('login')
+
 
 @login_required
 def search(requset):

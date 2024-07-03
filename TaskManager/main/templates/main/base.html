@@ -15,19 +15,10 @@
             </svg>
             <span class="fs-4">Aleksey Kornev</span>
         </a>
-        <form method="get" action="{% url 'search' %}" class="d-flex">
-            <input class="form-control me-2" type="search" placeholder="Поиск" aria-label="Поиск" name="query">
-            <select class="form-control me-2" name="chapter">
-                <option value="">Все разделы</option>
-                {% for chapter in chapters %}
-                <option value="{{ chapter.id }}">{{ chapter.name }}</option>
-                {% endfor %}
-            </select>
-            <button class="btn btn-outline-success" type="submit" style="margin-right: 80px">Найти</button>
-        </form>
         <ul class="nav nav-pills">
             <li class="nav-item"><a href="{% url 'home' %}" class="nav-link active" aria-current="page">Главная</a></li>
             <li class="nav-item"><a href="{% url 'about' %}" class="nav-link">О нас</a></li>
+            <li class="nav-item"><a href="{% url 'search' %}" class="nav-link">Поиск</a></li>
             <li class="nav-item"><a href="{% url 'create' %}" class="nav-link">Создать задачу</a></li>
         </ul>
     </header>

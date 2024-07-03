@@ -13,6 +13,7 @@
                 <h3><a href="{%url 'edit' task.id%}">{{ task.title }}</a></h3>
                 <p>{{ task.task }}</p>
                 <p>Раздел: {{ task.chapter }}</p>
+                <p>Автор: {{ task.user }}</p>
             </div>
         {% endfor %}
     {% else %}

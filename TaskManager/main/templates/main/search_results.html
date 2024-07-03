@@ -5,17 +5,37 @@
 {% endblock %}
 
 {% block content %}
-    <h1>Результаты поиска</h1>
-    <a href="{% url 'logout' %}"><button class="btn"><b>Logout</b></button></a>
-    {% if tasks %}
-        {% for task in tasks %}
-            <div class="alert alert-warning mt-2">
-                <h3><a href="{%url 'edit' task.id%}">{{ task.title }}</a></h3>
-                <p>{{ task.task }}</p>
-                <p>Раздел: {{ task.chapter }}</p>
-            </div>
-        {% endfor %}
-    {% else %}
-        <p>У вас нет записей!</p>
-    {% endif %}
+<h1>Результаты поиска</h1>
+
+<form method="get" action="{% url 'search' %}" class="mb-4">
+    <div class="mb-3">
+        <label for="query" class="form-label">Поиск</label>
+        <input type="text" id="query" name="query" value="{{ query }}" class="form-control">
+    </div>
+    <div class="mb-3">
+        <label for="chapter" class="form-label">Раздел</label>
+        <select id="chapter" name="chapter" class="form-control">
+            <option value="">Все разделы</option>
+            {% for chapter in chapters %}
+                <option value="{{ chapter.id }}" {% if chapter.id|stringformat:"s" == chapter_id %}selected{% endif %}>
+                    {{ chapter.name }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Поиск</button>
+</form>
+
+{% if tasks %}
+    {% for task in tasks %}
+        <div class="alert alert-warning mt-2">
+            <h3><a href="{% url 'edit' task.id %}">{{ task.title }}</a></h3>
+            <p>{{ task.task }}</p>
+            <p style="color: purple;">Раздел: {{ task.chapter }}</p>
+            <p style="color: black;">Автор: {{ task.user }}</p>
+        </div>
+    {% endfor %}
+{% else %}
+    <p>Ничего не найдено</p>
+{% endif %}
 {% endblock %}
