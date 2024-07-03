@@ -7,6 +7,7 @@ class Chapter(models.Model):
 
     def __str__(self):
         return self.name
+
     class Meta:
         verbose_name = 'Раздел'
         verbose_name_plural = 'Разделы'

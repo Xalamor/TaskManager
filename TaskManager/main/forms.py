@@ -4,6 +4,7 @@ from django.forms import ModelForm, TextInput, Textarea
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 
+
 class TaskForm(ModelForm):
     class Meta:
         model = Task
@@ -13,16 +14,18 @@ class TaskForm(ModelForm):
             'title': TextInput(attrs={
                 'class': 'form-control',
                 'placeholder': 'Введите название'
-        }),
+            }),
             'task': Textarea(attrs={
                 'class': 'form-control',
                 'placeholder': 'Введите описание'
-        }),
+            }),
             'user_can_read': django.forms.CheckboxSelectMultiple,
         }
 
+
 class UserRegisterForm(UserCreationForm):
     email = django.forms.EmailField()
+
     class Meta:
         model = User
         fields = ['username', 'email', 'password1', 'password2']
