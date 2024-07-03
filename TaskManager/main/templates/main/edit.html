@@ -1,0 +1,17 @@
+{% extends 'main/base.html' %}
+
+{% block title %}
+    Редактировать задачу
+{% endblock %}
+
+{% block content %}
+    <h1>Редактирование задачи</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.title }}<br>
+        {{ form.task }}<br>
+        <button type="submit" class="btn btn-success">Сохранить</button>
+        <button type="submit" class="btn" name="delete" onclick="return confirm('Вы уверены, что хотите удалить эту задачу?');">Удалить</button>
+        <span>{{ error }}</span>
+    </form>
+{% endblock %}
