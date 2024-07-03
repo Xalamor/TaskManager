@@ -150,3 +150,5 @@ def search(requset):
     }
 
     return render(requset, 'main/search_results.html', context)
+
+# ДИМА ПИДОРАС
