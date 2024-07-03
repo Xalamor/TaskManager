@@ -57,7 +57,7 @@ def edit(request, task_id):
     error = ''
 
     if task.user != request.user:
-        messages.error(request, 'Вы не имеете права редактировать эту задачу.')
+        # messages.error(request, 'Вы не имеете права редактировать эту задачу.')
         return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
 
     if request.method == 'POST':
@@ -150,5 +150,3 @@ def search(requset):
     }
 
     return render(requset, 'main/search_results.html', context)
-
-# ДИМА ПИДОРАС
