@@ -1,17 +1,27 @@
 from django.shortcuts import render, redirect, get_object_or_404, HttpResponse
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.forms import AuthenticationForm
-from .models import Task
+from django.db import models
+from .models import Task, Chapter
 from .forms import TaskForm, UserRegisterForm
 from django.contrib.auth.decorators import login_required
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 @login_required
 def index(request):
-    # Фильтруем задачи по текущему пользователю
-    tasks = Task.objects.filter(user=request.user).order_by('-id')
-    return render(request, 'main/index.html', {'title': 'Главная страница',
-                                               'tasks': tasks})
+    tasks = Task.objects.filter(
+        models.Q(visibility='everyone') |
+        models.Q(visibility='only_me', user=request.user) |
+        models.Q(visibility='selected', user_can_read=request.user)
+    ).distinct()
+
+    context = {
+        'tasks': tasks,
+    }
+    return render(request, 'main/index.html', context)
 
 @login_required
 def create(request):
@@ -23,11 +33,13 @@ def create(request):
             task = form.save(commit=False)
             task.user = request.user
             task.save()
+            form.save_m2m()
             return redirect('/')
         else:
             error = 'Форма неверна'
+    else:
+        form = TaskForm()
 
-    form = TaskForm()
     context = {
         'form': form,
         'error': error,
@@ -40,27 +52,27 @@ def about(request):
     return render(request, 'main/about.html')
 
 
-
 @login_required
 def edit(request, task_id):
     task = get_object_or_404(Task, id=task_id)
     error = ''
     if request.method == 'POST':
-        if 'save' in request.POST:
-            form = TaskForm(request.POST, instance=task)
-            if form.is_valid():
-                form.save()
-                return redirect('/')
-            else:
-                error = 'Форма неверна'
-        elif 'delete' in request.POST:
-            task.delete()
+        form = TaskForm(request.POST, instance=task)
+        if form.is_valid():
+            task = form.save(commit=False)
+            task.user = request.user
+            task.save()
+            form.save_m2m()  # save the many-to-many field after saving the task
             return redirect('/')
+        else:
+            error = 'Форма неверна'
+    else:
+        form = TaskForm(instance=task)
 
-    form = TaskForm(instance=task)
     context = {
         'form': form,
         'error': error,
+        'task': task,
     }
     return render(request, 'main/edit.html', context)
 
@@ -104,3 +116,26 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return redirect('login')
+
+@login_required
+def search(requset):
+    query = requset.GET.get('query', '')
+    chapter_id = requset.GET.get('chapter', '')
+
+    tasks = Task.objects.all()
+
+    if query:
+        tasks = tasks.filter(task__icontains=query)
+    if chapter_id:
+        tasks = tasks.filter(chapter_id=chapter_id)
+
+    chapters = Chapter.objects.all()
+
+    context = {
+        'tasks': tasks,
+        'chapters': chapters,
+        'query': query,
+        'chapter_id': chapter_id,
+    }
+
+    return render(requset, 'main/search_results.html', context)

@@ -1,5 +1,4 @@
 import django.forms
-
 from .models import Task
 from django.forms import ModelForm, TextInput, Textarea
 from django.contrib.auth.models import User
@@ -8,7 +7,7 @@ from django.contrib.auth.forms import UserCreationForm
 class TaskForm(ModelForm):
     class Meta:
         model = Task
-        fields = ['title', 'task']
+        fields = ['title', 'task', 'chapter', 'user_can_read', 'visibility']
         widgets = {
             'title': TextInput(attrs={
                 'class': 'form-control',
@@ -17,7 +16,9 @@ class TaskForm(ModelForm):
             'task': Textarea(attrs={
                 'class': 'form-control',
                 'placeholder': 'Введите описание'
-        })}
+        }),
+            'user_can_read': django.forms.CheckboxSelectMultiple,
+        }
 
 class UserRegisterForm(UserCreationForm):
     email = django.forms.EmailField()

@@ -1,11 +1,11 @@
 {% extends 'main/base.html' %}
 
 {% block title %}
-    {{ title }}
+    Результаты поиска
 {% endblock %}
 
 {% block content %}
-    <h1>Главная страница</h1>
+    <h1>Результаты поиска</h1>
     <a href="{% url 'logout' %}"><button class="btn"><b>Logout</b></button></a>
     {% if tasks %}
         {% for task in tasks %}
